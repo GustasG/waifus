@@ -1,0 +1,38 @@
+version: '3'
+
+tasks:
+  install:
+    desc: Install dependencies
+    cmds:
+      - npm install
+      - go mod tidy
+
+  build:
+    desc: Build the project
+    cmds:
+      - npx tailwindcss build -o assets/css/tailwind.css --minify
+      - templ generate
+      - CGO_ENABLED=0 go build pkg/server/main.go
+
+  templ:
+    desc: Run templ in watch mode
+    cmds:
+      - templ generate --watch --proxy="http://localhost:5000" --proxyport=3000 --open-browser=false -v
+
+  tailwind:
+    desc: Run tailwindcss in watch mode
+    cmds:
+      - npx tailwindcss build -o assets/css/tailwind.css --watch
+
+  server:
+    desc: Run live server
+    cmds:
+      - air
+
+  dev:
+    desc: Run development server
+    run: always
+    deps:
+      - server
+      - tailwind
+      - templ

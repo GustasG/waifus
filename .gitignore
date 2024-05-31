@@ -1,2 +1,14 @@
 # Visual Studio Code
 .vscode/
+
+# Node.js
+node_modules/
+
+tmp/
+
+# Generated files
+*_templ.go
+tailwind.css
+
+# Big files
+assets/languages/
