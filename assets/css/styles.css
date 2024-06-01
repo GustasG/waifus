@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.active-link {
+  @apply ring-2 ring-neutral-600 dark:ring-neutral-200 bg-slate-400 dark:bg-slate-600;
+}

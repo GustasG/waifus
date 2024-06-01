@@ -10,7 +10,7 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - npx tailwindcss build -o assets/css/tailwind.css --minify
+      - npx tailwindcss build -i assets/css/styles.css -o assets/css/tailwind.css --minify
       - templ generate
       - CGO_ENABLED=0 go build pkg/server/main.go
 
@@ -20,9 +20,9 @@ tasks:
       - templ generate --watch --proxy="http://localhost:5000" --proxyport=3000 --open-browser=false -v
 
   tailwind:
-    desc: Run tailwindcss in watch mode
+    desc: Run tailwind in watch mode
     cmds:
-      - npx tailwindcss build -o assets/css/tailwind.css --watch
+      - npx tailwindcss build -i assets/css/styles.css -o assets/css/tailwind.css --watch
 
   server:
     desc: Run live server
