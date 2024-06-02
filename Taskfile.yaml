@@ -10,27 +10,29 @@ tasks:
   build:
     desc: Build the project
     cmds:
-      - npx tailwindcss build -i assets/css/styles.css -o assets/css/tailwind.css --minify
+      - npx tailwindcss build -i assets/css/styles.css -o assets/css/globals.css --minify
       - templ generate
-      - CGO_ENABLED=0 go build pkg/server/main.go
+      - go build -ldflags "-s -w" pkg/server/main.go
+    env:
+      CGO_ENABLED: 0
 
   templ:
-    desc: Run templ in watch mode
+    desc: Start templ in watch mode
     cmds:
-      - templ generate --watch --proxy="http://localhost:5000" --proxyport=3000 --open-browser=false -v
+      - templ generate --watch --proxy="http://localhost:5000" --proxyport=3000
 
   tailwind:
-    desc: Run tailwind in watch mode
+    desc: Start tailwind in watch mode
     cmds:
-      - npx tailwindcss build -i assets/css/styles.css -o assets/css/tailwind.css --watch
+      - npx tailwindcss build -i assets/css/styles.css -o assets/css/globals.css --watch
 
   server:
-    desc: Run live server
+    desc: Start live server
     cmds:
       - air
 
   dev:
-    desc: Run development server
+    desc: Start development server
     run: always
     deps:
       - server

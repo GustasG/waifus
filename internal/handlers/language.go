@@ -21,7 +21,7 @@ func findImages(language string) ([]string, error) {
 		return nil, err
 	}
 
-	images := make([]string, 0)
+	images := make([]string, 0, len(entries))
 	for _, entry := range entries {
 		fullPath := fmt.Sprintf("/assets/languages/%s/%s", url.PathEscape(language), url.PathEscape(entry.Name()))
 		images = append(images, fullPath)
@@ -30,14 +30,14 @@ func findImages(language string) ([]string, error) {
 	return images, nil
 }
 
-func NewPageHandler() (*LanguagePageHandler, error) {
+func NewPageHandler() (LanguagePageHandler, error) {
 	entries, err := os.ReadDir(filepath.Join("assets", "languages"))
 	if err != nil {
-		return nil, err
+		return LanguagePageHandler{}, err
 	}
 
 	if len(entries) == 0 {
-		return nil, fmt.Errorf("no languages found")
+		return LanguagePageHandler{}, fmt.Errorf("no languages found")
 	}
 
 	languages := make([]string, 0, len(entries))
@@ -51,21 +51,21 @@ func NewPageHandler() (*LanguagePageHandler, error) {
 		languages = append(languages, language)
 		images[language], err = findImages(language)
 		if err != nil {
-			return nil, err
+			return LanguagePageHandler{}, err
 		}
 	}
 
-	return &LanguagePageHandler{
+	return LanguagePageHandler{
 		languages: languages,
 		images:    images,
 	}, nil
 }
 
-func (h *LanguagePageHandler) HandleIndex() http.Handler {
+func (h LanguagePageHandler) HandleIndex() http.Handler {
 	return http.RedirectHandler(fmt.Sprintf("/language/%s", h.languages[0]), http.StatusSeeOther)
 }
 
-func (h *LanguagePageHandler) HandleLanguage() http.Handler {
+func (h LanguagePageHandler) HandleLanguage() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		language := r.PathValue("language")
 

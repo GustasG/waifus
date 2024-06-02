@@ -18,7 +18,8 @@ tmp/
 
 # Generated files
 *_templ.go
-tailwind.css
+globals.css
+*_templ.txt
 
 # Log files
 *.log
