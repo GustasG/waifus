@@ -8,7 +8,7 @@ Made with templ + HTMX
 
 Compiling and using this project requires several tools to be installed first
 
-This repository uses git submodules to pull everything from submodules you can use command `git pull --recurse-submodules`
+This repository uses git submodules. Make sure to also pull submodules for everything to work!
 
 1. Install [Go](https://go.dev)
 2. Install [Node.js](https://nodejs.org)

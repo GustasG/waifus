@@ -6,10 +6,18 @@ import (
 )
 
 templ hamburgerButton() {
-	<div class="sm:hidden p-2 bg-gradient-to-t from-fuchsia-600 to-purple-600">
+	<div class="fixed flex justify-end w-full sm:hidden p-2 bg-gradient-to-t from-fuchsia-600 to-purple-600 z-10">
 		<button id="hamburger-button" class="text-white">
 			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+				<path d="M4 18L20 18" stroke-width="2" stroke-linecap="round"></path>
+				<path d="M4 12L20 12" stroke-width="2" stroke-linecap="round"></path>
+				<path d="M4 6L20 6" stroke-width="2" stroke-linecap="round"></path>
+			</svg>
+		</button>
+		<button id="close-button" class="hidden text-white">
+			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+				<path d="M3 21.32L21 3.32001" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+				<path d="M3 3.32001L21 21.32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
 			</svg>
 		</button>
 	</div>
@@ -18,7 +26,7 @@ templ hamburgerButton() {
 templ sidepanel(languages []string, selectedLanguage string) {
 	<aside
 		id="sidebar"
-		class="fixed sm:static transform -translate-x-full sm:translate-x-0 transition-transform duration-300 h-screen w-[60%] sm:w-48 md:w-56 lg:w-64 xl:w-72 overflow-y-scroll bg-gradient-to-b from-fuchsia-600 to-purple-600 z-50 pb-12 sm:pb-0"
+		class="fixed sm:static transform -translate-x-full sm:translate-x-0 transition-transform duration-300 h-screen w-56 sm:w-48 md:w-56 lg:w-64 xl:w-72 overflow-y-scroll bg-gradient-to-b from-fuchsia-600 to-purple-600 z-10"
 	>
 		<ul class="flex flex-col p-4 gap-4" hx-boost="true">
 			for _, language := range languages {
@@ -40,13 +48,13 @@ templ sidepanel(languages []string, selectedLanguage string) {
 }
 
 templ imageGrid(images []string) {
-	<main class="w-full bg-gradient-to-br from-pink-500 to-rose-500">
+	<main class="w-full pt-12 sm:pt-0 bg-gradient-to-br from-pink-500 to-rose-500">
 		<div class="overflow-y-scroll h-screen p-4">
 			<div class="sm:columns-2 md:columns-3 lg:columns-3 xl:columns-4 2xl:columns-5 gap-x-4">
 				for _, image := range images {
 					<a class="outline-none" href={ templ.URL(image) } target="_blank" rel="noreferrer">
 						<img
-							class="sm:grayscale hover:grayscale-0 hover:scale-105 sm:hover:saturate-150 transition duration-300 rounded-md mb-4 bg-white"
+							class="sm:grayscale hover:grayscale-0 sm:hover:scale-105 sm:hover:saturate-150 transition duration-300 rounded-md mb-4 bg-white"
 							src={ image }
 						/>
 					</a>
@@ -66,7 +74,7 @@ templ languagePage(languages []string, images []string, selectedLanguage string)
 			<link href="/assets/css/globals.css" rel="stylesheet"/>
 			<script src="/assets/js/htmx.min.js"></script>
 		</head>
-		<body class="relative">
+		<body>
 			@hamburgerButton()
 			<div class="flex">
 				@sidepanel(languages, selectedLanguage)
