@@ -1,11 +1,11 @@
-version: '3'
+version: "3"
 
 tasks:
   install:
     desc: Install dependencies
     cmds:
       - npm install
-      - go mod tidy
+      - go mod download
 
   build:
     desc: Build the project
@@ -30,6 +30,8 @@ tasks:
     desc: Start live server
     cmds:
       - air
+    env:
+      PORT: 5000
 
   dev:
     desc: Start development server

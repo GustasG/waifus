@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 .active-link {
-  @apply ring-2 ring-neutral-200 bg-pink-500;
+  @apply ring-2 bg-pink-500;
 }

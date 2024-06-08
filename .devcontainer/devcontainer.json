@@ -1,0 +1,21 @@
+{
+	"name": "waifus",
+	"image": "mcr.microsoft.com/devcontainers/go:1-1.22-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/eitsupi/devcontainer-features/go-task:1": {},
+		"ghcr.io/dusansimic/devcontainer-features/templ:0": {}
+	},
+	"postCreateCommand": "go install github.com/air-verse/air@latest",
+	"forwardPorts": [3000],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"streetsidesoftware.code-spell-checker",
+				"DavidAnson.vscode-markdownlint",
+				"bradlc.vscode-tailwindcss",
+				"a-h.templ"
+			]
+		}
+	}
+}

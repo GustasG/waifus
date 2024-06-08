@@ -28,3 +28,7 @@ This repository uses git submodules to pull everything from submodules you can u
 
 1. Run `task install` to install necessary dependencies
 2. Run `task dev` this will start development server on localhost:3000
+
+### Defining environment variables
+
+1. PORT - Optional variable for which port to use (defaults to 5000)

@@ -1,4 +1,4 @@
-package handlers
+package language
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-
-	"github.com/GustasG/waifus/internal/templates"
 )
 
 type LanguagePageHandler struct {
@@ -42,6 +40,7 @@ func NewPageHandler() (LanguagePageHandler, error) {
 
 	languages := make([]string, 0, len(entries))
 	images := make(map[string][]string, len(entries))
+
 	for _, entry := range entries {
 		if !entry.IsDir() {
 			continue
@@ -61,26 +60,24 @@ func NewPageHandler() (LanguagePageHandler, error) {
 	}, nil
 }
 
-func (h LanguagePageHandler) HandleIndex() http.Handler {
-	return http.RedirectHandler(fmt.Sprintf("/language/%s", h.languages[0]), http.StatusSeeOther)
+func (h LanguagePageHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, fmt.Sprintf("/language/%s", h.languages[0]), http.StatusSeeOther)
 }
 
-func (h LanguagePageHandler) HandleLanguage() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		language := r.PathValue("language")
+func (h LanguagePageHandler) HandleLanguage(w http.ResponseWriter, r *http.Request) {
+	language := r.PathValue("language")
 
-		images, ok := h.images[language]
-		if !ok {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
+	images, ok := h.images[language]
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
 
-		if r.Header.Get("Hx-Request") == "true" {
-			component := templates.ImageGrid(images)
-			component.Render(r.Context(), w)
-		} else {
-			component := templates.LanguagePage(h.languages, images, language)
-			component.Render(r.Context(), w)
-		}
-	})
+	if r.Header.Get("Hx-Request") == "true" {
+		component := imageGrid(images)
+		component.Render(r.Context(), w)
+	} else {
+		component := languagePage(h.languages, images, language)
+		component.Render(r.Context(), w)
+	}
 }
