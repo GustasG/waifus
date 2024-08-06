@@ -40,6 +40,13 @@ closeButton.addEventListener("click", () => {
   closeSidebar();
 });
 
+document.addEventListener("click", (e) => {
+  console.log(e.target);
+  if (!sidebar.contains(e.target) && !hamburgerButton.contains(e.target)) {
+    closeSidebar();
+  }
+});
+
 document.addEventListener("htmx:beforeRequest", (e) => {
   changeActiveLink(e);
   blurImages();
