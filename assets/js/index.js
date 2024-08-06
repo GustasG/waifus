@@ -41,7 +41,6 @@ closeButton.addEventListener("click", () => {
 });
 
 document.addEventListener("click", (e) => {
-  console.log(e.target);
   if (!sidebar.contains(e.target) && !hamburgerButton.contains(e.target)) {
     closeSidebar();
   }
