@@ -1,67 +1,80 @@
 package language
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 )
+
+const cdnBase = "https://raw.githubusercontent.com/cat-milk/Anime-Girls-Holding-Programming-Books/master"
 
 type LanguagePageHandler struct {
 	languages []string
 	images    map[string][]string
-}
-
-func findImages(language string) ([]string, error) {
-	entries, err := os.ReadDir(filepath.Join("assets", "languages", language))
-	if err != nil {
-		return nil, err
-	}
-
-	images := make([]string, 0, len(entries))
-	for _, entry := range entries {
-		fullPath := fmt.Sprintf("/assets/languages/%s/%s", url.PathEscape(language), url.PathEscape(entry.Name()))
-		images = append(images, fullPath)
-	}
-
-	return images, nil
+	counts    map[string]int
 }
 
 func NewPageHandler() (LanguagePageHandler, error) {
-	entries, err := os.ReadDir(filepath.Join("assets", "languages"))
+	data, err := os.ReadFile(filepath.Join("assets", "manifest.json"))
 	if err != nil {
-		return LanguagePageHandler{}, err
+		return LanguagePageHandler{}, fmt.Errorf("manifest not found — run scripts/generate_manifest.py first: %w", err)
 	}
 
-	if len(entries) == 0 {
-		return LanguagePageHandler{}, fmt.Errorf("no languages found")
+	var raw map[string][]string
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return LanguagePageHandler{}, fmt.Errorf("parse manifest: %w", err)
+	}
+	if len(raw) == 0 {
+		return LanguagePageHandler{}, fmt.Errorf("manifest is empty")
 	}
 
-	languages := make([]string, 0, len(entries))
-	images := make(map[string][]string, len(entries))
+	languages := make([]string, 0, len(raw))
+	for lang := range raw {
+		languages = append(languages, lang)
+	}
+	sort.Strings(languages)
 
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
+	images := make(map[string][]string, len(raw))
+	counts := make(map[string]int, len(raw))
+	for lang, files := range raw {
+		urls := make([]string, len(files))
+		for i, f := range files {
+			urls[i] = fmt.Sprintf("%s/%s/%s", cdnBase, url.PathEscape(lang), url.PathEscape(f))
 		}
-
-		language := entry.Name()
-		languages = append(languages, language)
-		images[language], err = findImages(language)
-		if err != nil {
-			return LanguagePageHandler{}, err
-		}
+		images[lang] = urls
+		counts[lang] = len(urls)
 	}
 
-	return LanguagePageHandler{
-		languages: languages,
-		images:    images,
-	}, nil
+	return LanguagePageHandler{languages: languages, images: images, counts: counts}, nil
 }
 
-func (h LanguagePageHandler) HandleIndex(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, fmt.Sprintf("/language/%s", h.languages[0]), http.StatusSeeOther)
+var popularLanguages = []string{"Python", "Go", "JavaScript", "TypeScript", "Rust", "Java", "C++", "C"}
+
+func (h LanguagePageHandler) FeaturedLanguage() string {
+	for _, lang := range popularLanguages {
+		if _, ok := h.images[lang]; ok {
+			return lang
+		}
+	}
+	if len(h.languages) > 0 {
+		return h.languages[0]
+	}
+	return ""
+}
+
+func (h LanguagePageHandler) Languages() []string     { return h.languages }
+func (h LanguagePageHandler) Counts() map[string]int  { return h.counts }
+
+func (h LanguagePageHandler) TotalImages() int {
+	total := 0
+	for _, c := range h.counts {
+		total += c
+	}
+	return total
 }
 
 func (h LanguagePageHandler) HandleLanguage(w http.ResponseWriter, r *http.Request) {
@@ -69,15 +82,17 @@ func (h LanguagePageHandler) HandleLanguage(w http.ResponseWriter, r *http.Reque
 
 	images, ok := h.images[language]
 	if !ok {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.NotFound(w, r)
 		return
 	}
 
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	if r.Header.Get("Hx-Request") == "true" {
-		component := imageGrid(images)
+		component := imageGrid(images, language, h.counts[language])
 		component.Render(r.Context(), w)
 	} else {
-		component := languagePage(h.languages, images, language)
+		component := languagePage(h.languages, h.counts, images, language)
 		component.Render(r.Context(), w)
 	}
 }

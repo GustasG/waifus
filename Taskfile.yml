@@ -4,13 +4,13 @@ tasks:
   install:
     desc: Install dependencies
     cmds:
-      - npm install
       - go mod download
+      - npm install
 
   build:
     desc: Build the project
     cmds:
-      - npx tailwindcss build -i assets/css/styles.css -o assets/css/globals.css --minify
+      - npx @tailwindcss/cli -i assets/css/styles.css -o assets/css/globals.css --minify
       - templ generate
       - go build -ldflags "-s -w" cmd/server/main.go
     env:
@@ -24,7 +24,7 @@ tasks:
   tailwind:
     desc: Start tailwind in watch mode
     cmds:
-      - npx tailwindcss build -i assets/css/styles.css -o assets/css/globals.css --watch
+      - npx @tailwindcss/cli -i assets/css/styles.css -o assets/css/globals.css --watch
 
   server:
     desc: Start live server

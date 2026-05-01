@@ -2,28 +2,45 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/GustasG/waifus/internal/index"
 	"github.com/GustasG/waifus/internal/language"
 )
 
+func withCacheControl(h http.Handler, maxAge int) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", maxAge))
+		h.ServeHTTP(w, r)
+	})
+}
+
 func main() {
-	h, err := language.NewPageHandler()
+	langHandler, err := language.NewPageHandler()
 	if err != nil {
-		log.Fatalf("could not create page handler: %v", err)
+		log.Fatalf("could not create language handler: %v", err)
 	}
 
+	idxHandler := index.NewHandler(langHandler.Languages(), langHandler.Counts(), langHandler.TotalImages(), langHandler.FeaturedLanguage())
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", h.HandleIndex)
-	mux.HandleFunc("GET /language/{language}", h.HandleLanguage)
-	mux.Handle("GET /assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("assets"))))
-	mux.Handle("GET /favicon.ico", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "assets/favicon.ico")
-	}))
+	mux.HandleFunc("GET /", idxHandler.HandleIndex)
+	mux.HandleFunc("GET /language/{language}", langHandler.HandleLanguage)
+	mux.Handle("GET /assets/", withCacheControl(
+		http.StripPrefix("/assets", http.FileServer(http.Dir("assets"))),
+		86400,
+	))
+	mux.Handle("GET /favicon.ico", withCacheControl(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "assets/favicon.ico")
+		}),
+		86400,
+	))
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -33,8 +50,9 @@ func main() {
 	s := &http.Server{
 		Addr:         ":" + port,
 		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	idleConnsClosed := make(chan struct{})

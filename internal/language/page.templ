@@ -2,85 +2,62 @@ package language
 
 import (
 	"fmt"
-	"net/url"
+	"github.com/GustasG/waifus/internal/shared"
 )
 
-templ hamburgerButton() {
-	<div class="fixed flex justify-end w-full sm:hidden p-2 bg-gradient-to-t from-fuchsia-600 to-purple-600 z-10">
-		<button id="hamburger-button" class="text-white">
-			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-				<path d="M4 18L20 18" stroke-width="2" stroke-linecap="round"></path>
-				<path d="M4 12L20 12" stroke-width="2" stroke-linecap="round"></path>
-				<path d="M4 6L20 6" stroke-width="2" stroke-linecap="round"></path>
-			</svg>
-		</button>
-		<button id="close-button" class="hidden text-white">
-			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-				<path d="M3 21.32L21 3.32001" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-				<path d="M3 3.32001L21 21.32" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-			</svg>
-		</button>
-	</div>
+func firstImage(images []string) string {
+	if len(images) > 0 {
+		return images[0]
+	}
+	return ""
 }
 
-templ sidepanel(languages []string, selectedLanguage string) {
-	<aside
-		id="sidebar"
-		class="fixed sm:static transform -translate-x-full sm:translate-x-0 transition-transform duration-300 h-screen w-56 sm:w-48 md:w-56 lg:w-64 xl:w-72 overflow-y-scroll bg-gradient-to-b from-fuchsia-600 to-purple-600 z-10"
-	>
-		<ul class="flex flex-col p-4 gap-4" hx-boost="true">
-			for _, language := range languages {
-				<li>
-					<a
-						href={ templ.URL(fmt.Sprintf("/language/%s", url.PathEscape(language))) }
-						hx-target="main"
-						hx-swap="outerHTML"
-						class={ "flex p-2 rounded hover:-translate-y-1 duration-300 bg-pink-400 hover:bg-pink-500 ring-neutral-200 outline-none",
-								templ.KV("active-link", language == selectedLanguage) }
-						title={ language }
-					>
-						<span class="truncate text-white">{ language }</span>
-					</a>
-				</li>
-			}
-		</ul>
-	</aside>
-}
-
-templ imageGrid(images []string) {
-	<main class="w-full pt-12 sm:pt-0 bg-gradient-to-br from-pink-500 to-rose-500">
-		<div class="overflow-y-scroll h-screen p-4">
-			<div class="sm:columns-2 md:columns-3 lg:columns-3 xl:columns-4 2xl:columns-5 gap-x-4">
-				for _, image := range images {
-					<a class="outline-none" href={ templ.URL(image) } target="_blank" rel="noreferrer">
-						<img
-							class="sm:grayscale hover:grayscale-0 sm:hover:scale-105 sm:hover:saturate-150 transition duration-300 rounded-md mb-4 bg-white"
-							src={ image }
-						/>
-					</a>
-				}
+templ imageGrid(images []string, language string, count int) {
+	<main class="w-full bg-gradient-to-br from-pink-500 to-rose-500 min-h-screen">
+		<div class="overflow-y-auto h-screen">
+			<div class="sticky top-0 z-20 bg-gradient-to-r from-pink-600/90 to-rose-600/90 backdrop-blur-sm px-4 py-3 border-b border-white/10 flex items-center gap-3">
+				@shared.MobileNavButtons()
+				<h1 class="text-lg font-bold text-white truncate">{ language }</h1>
+				<span class="inline-flex text-xs bg-white/20 text-white/90 px-2 py-0.5 rounded-full shrink-0">
+					{ fmt.Sprintf("%d", count) }
+				</span>
 			</div>
+			<div class="p-4">
+				<div id="image-grid" class="sm:columns-2 md:columns-3 lg:columns-3 xl:columns-4 2xl:columns-5 gap-x-4">
+					for i, image := range images {
+						<figure class="break-inside-avoid mb-4 group cursor-zoom-in" data-image={ image }>
+							<img
+								class="w-full h-auto rounded-md bg-white shadow-md sm:grayscale hover:grayscale-0 sm:hover:scale-105 sm:hover:saturate-150 transition duration-300"
+								loading="lazy"
+								decoding="async"
+								src={ image }
+								alt={ fmt.Sprintf("%s image %d", language, i+1) }
+							/>
+						</figure>
+					}
+				</div>
+			</div>
+			<button
+				id="back-to-top"
+				class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-30 p-3 rounded-full bg-white/20 text-white/90 hover:text-white hover:bg-white/30 transition-colors backdrop-blur-sm border border-white/10 shadow-lg cursor-pointer"
+				aria-label="Back to top"
+			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+				</svg>
+			</button>
 		</div>
 	</main>
 }
 
-templ languagePage(languages []string, images []string, selectedLanguage string) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<title>{ selectedLanguage }</title>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-			<link href="/assets/css/globals.css" rel="stylesheet"/>
-			<script src="/assets/js/htmx.min.js"></script>
-		</head>
-		<body>
-			@hamburgerButton()
-			<div class="flex">
-				@sidepanel(languages, selectedLanguage)
-				@imageGrid(images)
-			</div>
-			<script src="/assets/js/index.js"></script>
-		</body>
-	</html>
+templ languagePage(languages []string, counts map[string]int, images []string, selectedLanguage string) {
+	@shared.BaseLayout(
+		selectedLanguage + " \u2014 Waifus",
+		fmt.Sprintf("Browse anime girls holding %s programming books", selectedLanguage),
+		firstImage(images),
+		languages,
+		counts,
+		selectedLanguage,
+		imageGrid(images, selectedLanguage, counts[selectedLanguage]),
+	)
 }

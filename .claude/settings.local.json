@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js\" -o /mnt/d/dev/waifus/assets/js/htmx.min.js)",
+      "Bash(curl -fL \"https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js\" --output /mnt/d/dev/waifus/assets/js/htmx.min.js)",
+      "Bash(echo \"exit: $?\")"
+    ]
+  }
+}

@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-.active-link {
-  @apply ring-2 bg-pink-500;
-}
+@source "../../../internal/**/*.templ";

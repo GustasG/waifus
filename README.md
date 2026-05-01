@@ -1,34 +1,52 @@
 # Waifus
 
-Frontend interface for [Anime Girls Holding Programming Books](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books) repository
+Frontend interface for [Anime Girls Holding Programming Books](https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books)
 
-Made with templ + HTMX
+Made with Go, templ, and HTMX. Images are served directly from GitHub via `raw.githubusercontent.com`.
 
 ## Prerequisites
 
-Compiling and using this project requires several tools to be installed first
+1. [Go](https://go.dev)
+2. [Node.js](https://nodejs.org)
+3. [Task](https://taskfile.dev)
+4. [templ](https://templ.guide)
+5. [air](https://github.com/cosmtrek/air) — optional, for live reloading
 
-This repository uses git submodules. Make sure to also pull submodules for everything to work!
+## Setup
 
-1. Install [Go](https://go.dev)
-2. Install [Node.js](https://nodejs.org)
+### 1. Generate the image manifest
 
-### Setting up
+The app reads from `assets/manifest.json` to know which languages and images exist. Generate it by pointing the script at a local clone of the image repository:
 
-1. Install [templ](https://templ.guide)
-2. Install [Task](https://taskfile.dev)
-3. (Optionally for live reloading) install [air](https://github.com/cosmtrek/air)
+```bash
+git clone https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books
+python scripts/generate_manifest.py Anime-Girls-Holding-Programming-Books -o assets/manifest.json
+```
 
-### Building
+Commit `assets/manifest.json`. Re-run this script whenever the image repository is updated.
 
-1. Run `task install` to install necessary dependencies
-2. Run `task build` to produce finally binary
+### 2. Install dependencies
 
-### Developing
+```bash
+task install
+```
 
-1. Run `task install` to install necessary dependencies
-2. Run `task dev` this will start development server on localhost:3000
+### 3. Build or run
 
-## Defining environment variables
+**Production build:**
 
-1. PORT - Optional variable for which port to use (defaults to 5000)
+```bash
+task build
+```
+
+**Development server** (live reload on localhost:3000):
+
+```bash
+task dev
+```
+
+## Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `5000` | Port the server listens on |

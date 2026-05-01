@@ -1,0 +1,91 @@
+package index
+
+import (
+	"fmt"
+	"net/url"
+	"github.com/GustasG/waifus/internal/shared"
+)
+
+templ indexContent(languages []string, counts map[string]int, totalImages int, featuredLanguage string) {
+	<main class="w-full bg-gradient-to-br from-pink-500 to-rose-500 min-h-screen">
+		<div class="overflow-y-auto h-screen">
+			<div class="sticky top-0 z-20 bg-gradient-to-r from-pink-600/90 to-rose-600/90 backdrop-blur-sm px-4 py-3 border-b border-white/10 flex items-center sm:hidden">
+				@shared.MobileNavButtons()
+				<h1 class="flex-1 text-center text-lg font-bold text-white">Waifus</h1>
+			</div>
+			<div class="flex flex-col items-center justify-center min-h-[calc(100vh-3rem)] p-6 text-center">
+				<div class="max-w-2xl w-full bg-white/10 backdrop-blur-sm rounded-2xl p-8 sm:p-12 border border-white/20 shadow-xl">
+					<div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+						W
+					</div>
+					<h1 class="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+						Waifus
+					</h1>
+					<p class="text-lg text-white/90 mb-2 font-medium">
+						Anime Girls Holding Programming Books
+					</p>
+					<p class="text-white/70 mb-8 max-w-lg mx-auto leading-relaxed">
+						A frontend interface for browsing the iconic repository of anime characters holding programming books.
+						Explore { fmt.Sprintf("%d", len(languages)) } programming languages and over { fmt.Sprintf("%d", totalImages) } curated images.
+					</p>
+
+					<div class="flex flex-col sm:flex-row gap-3 justify-center mb-10">
+						<a
+							href={ templ.URL(fmt.Sprintf("/language/%s", url.PathEscape(featuredLanguage))) }
+							class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-pink-600 font-semibold rounded-xl hover:bg-white/90 transition-colors shadow-lg cursor-pointer"
+						>
+							<span>Start Browsing</span>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path d="M13 7l5 5m0 0l-5 5m5-5H6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+							</svg>
+						</a>
+						<a
+							href="https://github.com/cat-milk/Anime-Girls-Holding-Programming-Books"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/15 text-white font-semibold rounded-xl hover:bg-white/25 transition-colors border border-white/20"
+						>
+							<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"></path>
+							</svg>
+							<span>Original Repo</span>
+						</a>
+					</div>
+
+					<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-left">
+						<div class="bg-white/10 rounded-lg p-4 border border-white/10">
+							<div class="text-2xl font-bold text-white mb-1">{ fmt.Sprintf("%d", len(languages)) }</div>
+							<div class="text-xs text-white/60 uppercase tracking-wider">Languages</div>
+						</div>
+						<div class="bg-white/10 rounded-lg p-4 border border-white/10">
+							<div class="text-2xl font-bold text-white mb-1">{ fmt.Sprintf("%d", totalImages) }</div>
+							<div class="text-xs text-white/60 uppercase tracking-wider">Total Images</div>
+						</div>
+						<div class="bg-white/10 rounded-lg p-4 border border-white/10 col-span-2 sm:col-span-1">
+							<div class="text-2xl font-bold text-white mb-1">Open Source</div>
+							<div class="text-xs text-white/60 uppercase tracking-wider">Built with Go + HTMX</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mt-6 text-white/50 text-sm">
+					<a href="https://github.com/GustasG/waifus" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">
+						github.com/GustasG/waifus
+					</a>
+				</div>
+			</div>
+		</div>
+	</main>
+}
+
+templ indexPage(languages []string, counts map[string]int, totalImages int, featuredLanguage string) {
+	@shared.BaseLayout(
+		"Waifus",
+		"A frontend interface for browsing anime girls holding programming books",
+		"",
+		languages,
+		counts,
+		"",
+		indexContent(languages, counts, totalImages, featuredLanguage),
+	)
+}

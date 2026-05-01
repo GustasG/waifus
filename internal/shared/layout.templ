@@ -1,0 +1,137 @@
+package shared
+
+import (
+	"fmt"
+	"net/url"
+)
+
+templ MobileNavButtons() {
+	<button id="hamburger-button" class="sm:hidden text-white p-1 rounded hover:bg-white/10 transition-colors cursor-pointer">
+		<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path d="M4 18L20 18" stroke-width="2" stroke-linecap="round"></path>
+			<path d="M4 12L20 12" stroke-width="2" stroke-linecap="round"></path>
+			<path d="M4 6L20 6" stroke-width="2" stroke-linecap="round"></path>
+		</svg>
+	</button>
+	<button id="close-button" class="hidden sm:hidden text-white p-1 rounded hover:bg-white/10 transition-colors cursor-pointer">
+		<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+		</svg>
+	</button>
+}
+
+templ sidepanel(languages []string, counts map[string]int, selectedLanguage string) {
+	<aside
+		id="sidebar"
+		class="fixed sm:static transform -translate-x-full sm:translate-x-0 transition-transform duration-300 h-screen w-64 sm:w-52 md:w-60 lg:w-64 xl:w-72 overflow-y-auto bg-gradient-to-b from-fuchsia-600 to-purple-600 z-50 flex flex-col"
+	>
+		<div class="p-4 pb-2 shrink-0">
+			<a href="/" class="flex items-center gap-2 text-white font-bold text-lg mb-3" hx-boost="true" hx-target="main" hx-swap="outerHTML">
+				<span class="w-7 h-7 rounded bg-white/20 flex items-center justify-center text-sm">W</span>
+				<span>Waifus</span>
+			</a>
+			<div class="relative">
+				<svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+				</svg>
+				<input
+					id="language-search"
+					type="text"
+					placeholder="Search..."
+					class="w-full pl-8 pr-3 py-1.5 bg-white/15 border border-white/20 rounded-md text-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 focus:bg-white/20 transition-all"
+				/>
+			</div>
+		</div>
+		<nav class="flex-1 overflow-y-auto px-2 pb-2" id="language-list">
+			<ul class="flex flex-col gap-1" hx-boost="true">
+				for _, language := range languages {
+					<li data-language={ language }>
+						<a
+							href={ templ.URL(fmt.Sprintf("/language/%s", url.PathEscape(language))) }
+							hx-target="main"
+							hx-swap="outerHTML"
+							class={ "flex items-center justify-between p-2 rounded hover:-translate-y-0.5 duration-200 bg-pink-400 hover:bg-pink-500 outline-none ring-white",
+								templ.KV("ring-2", language == selectedLanguage) }
+							title={ language }
+						>
+							<span class="truncate text-white text-sm font-medium">{ language }</span>
+							<span class="text-xs bg-white/20 text-white/90 px-1.5 py-0.5 rounded-full shrink-0 ml-2">
+								{ fmt.Sprintf("%d", counts[language]) }
+							</span>
+						</a>
+					</li>
+				}
+			</ul>
+			<p id="language-search-empty" class="hidden text-white/60 text-sm text-center py-4 px-2">No languages found</p>
+		</nav>
+		<div class="shrink-0 p-3 text-xs text-white/50 text-center border-t border-white/10">
+			{ fmt.Sprintf("%d languages", len(languages)) }
+		</div>
+	</aside>
+}
+
+templ lightbox() {
+	<div
+		id="lightbox"
+		class="fixed inset-0 z-50 items-center justify-center bg-black/90 backdrop-blur-sm cursor-zoom-out select-none"
+	>
+		<button id="lightbox-close" class="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 text-white/80 hover:text-white hover:bg-black/70 transition-colors cursor-pointer" aria-label="Close">
+			<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path d="M6 18L18 6M6 6l12 12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+			</svg>
+		</button>
+		<button id="lightbox-prev" class="absolute left-2 sm:left-4 z-10 p-2 sm:p-3 rounded-full bg-black/50 text-white/80 hover:text-white hover:bg-black/70 transition-colors cursor-pointer" aria-label="Previous image">
+			<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+			</svg>
+		</button>
+		<button id="lightbox-next" class="absolute right-2 sm:right-4 z-10 p-2 sm:p-3 rounded-full bg-black/50 text-white/80 hover:text-white hover:bg-black/70 transition-colors cursor-pointer" aria-label="Next image">
+			<svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path d="M9 5l7 7-7 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+			</svg>
+		</button>
+		<img id="lightbox-img" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg shadow-2xl cursor-default" src="" alt=""/>
+		<div id="lightbox-caption" class="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-white/70 bg-black/50 px-4 py-1.5 rounded-full"></div>
+	</div>
+}
+
+templ BaseLayout(title string, description string, ogImage string, languages []string, counts map[string]int, selectedLanguage string, content templ.Component) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<title>{ title }</title>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<meta name="description" content={ description }/>
+			<meta property="og:type" content="website"/>
+			<meta property="og:site_name" content="Waifus"/>
+			<meta property="og:title" content={ title }/>
+			<meta property="og:description" content={ description }/>
+			<meta name="twitter:card" content="summary_large_image"/>
+			<meta name="twitter:title" content={ title }/>
+			<meta name="twitter:description" content={ description }/>
+			if ogImage != "" {
+				<meta property="og:image" content={ ogImage }/>
+				<meta name="twitter:image" content={ ogImage }/>
+			}
+			<link href="/assets/css/globals.css" rel="stylesheet"/>
+			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V" crossorigin="anonymous"></script>
+			<style>
+				.htmx-swapping { opacity: 0.6; transition: opacity 150ms ease; }
+				#lightbox { display: none; }
+				#lightbox.active { display: flex; }
+				#sidebar-backdrop { display: none; }
+				#sidebar-backdrop.active { display: block; }
+			</style>
+		</head>
+		<body class="antialiased">
+			<div id="sidebar-backdrop" class="fixed inset-0 z-[5] bg-black/40 sm:hidden transition-opacity"></div>
+			<div class="flex">
+				@sidepanel(languages, counts, selectedLanguage)
+				@content
+			</div>
+			@lightbox()
+			<script src="/assets/js/app.js"></script>
+		</body>
+	</html>
+}
