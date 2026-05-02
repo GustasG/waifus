@@ -23,9 +23,9 @@ templ MobileNavButtons() {
 templ sidepanel(languages []string, counts map[string]int, selectedLanguage string) {
 	<aside
 		id="sidebar"
-		class="fixed sm:static transform -translate-x-full sm:translate-x-0 transition-transform duration-300 h-screen w-64 sm:w-52 md:w-60 lg:w-64 xl:w-72 overflow-y-auto bg-gradient-to-b from-fuchsia-600 to-purple-600 z-50 flex flex-col"
+		class="fixed sm:static transform -translate-x-full sm:translate-x-0 transition-transform duration-300 h-screen w-64 sm:w-52 md:w-60 lg:w-64 xl:w-72 overflow-y-auto bg-gradient-to-b from-pink-700 to-rose-700 z-50 flex flex-col"
 	>
-		<div class="p-4 pb-2 shrink-0">
+		<div class="px-2 pt-4 pb-2 shrink-0">
 			<a href="/" class="flex items-center gap-2 text-white font-bold text-lg mb-3" hx-boost="true" hx-target="main" hx-swap="outerHTML">
 				<span class="w-7 h-7 rounded bg-white/20 flex items-center justify-center text-sm">W</span>
 				<span>Waifus</span>
@@ -42,7 +42,7 @@ templ sidepanel(languages []string, counts map[string]int, selectedLanguage stri
 				/>
 			</div>
 		</div>
-		<nav class="flex-1 overflow-y-auto px-2 pb-2" id="language-list">
+		<nav class="flex-1 overflow-y-auto px-2 py-2" id="language-list">
 			<ul class="flex flex-col gap-1" hx-boost="true">
 				for _, language := range languages {
 					<li data-language={ language }>
@@ -50,7 +50,7 @@ templ sidepanel(languages []string, counts map[string]int, selectedLanguage stri
 							href={ templ.URL(fmt.Sprintf("/language/%s", url.PathEscape(language))) }
 							hx-target="main"
 							hx-swap="outerHTML"
-							class={ "flex items-center justify-between p-2 rounded hover:-translate-y-0.5 duration-200 bg-pink-400 hover:bg-pink-500 outline-none ring-white",
+							class={ "flex items-center justify-between p-2 rounded hover:-translate-y-0.5 duration-200 bg-white/15 hover:bg-white/25 outline-none ring-white",
 								templ.KV("ring-2", language == selectedLanguage) }
 							title={ language }
 						>
@@ -114,6 +114,8 @@ templ BaseLayout(title string, description string, ogImage string, languages []s
 				<meta property="og:image" content={ ogImage }/>
 				<meta name="twitter:image" content={ ogImage }/>
 			}
+			<meta name="theme-color" content="#be185d"/>
+			<link rel="preconnect" href="https://raw.githubusercontent.com"/>
 			<link href="/assets/css/globals.css" rel="stylesheet"/>
 			<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.min.js" integrity="sha384-H5SrcfygHmAuTDZphMHqBJLc3FhssKjG7w/CeCpFReSfwBWDTKpkzPP8c+cLsK+V" crossorigin="anonymous"></script>
 			<style>
@@ -131,7 +133,7 @@ templ BaseLayout(title string, description string, ogImage string, languages []s
 				@content
 			</div>
 			@lightbox()
-			<script src="/assets/js/app.js"></script>
+			<script src="/assets/js/app.min.js"></script>
 		</body>
 	</html>
 }

@@ -9,8 +9,11 @@ RUN apt-get update && \
 RUN go install github.com/a-h/templ/cmd/templ@latest
 RUN npm install -g @go-task/cli
 
-COPY go.mod go.sum Taskfile.yml package.json package-lock.json .
-RUN task install
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 RUN task build
@@ -22,9 +25,10 @@ EXPOSE 5000
 WORKDIR /app
 
 COPY --from=builder /app/main .
-COPY --from=builder /app/assets/css ./assets/css
-COPY --from=builder /app/assets/js ./assets/js
+COPY --from=builder /app/assets/css/globals.css ./assets/css/globals.css
+COPY --from=builder /app/assets/js/app.min.js ./assets/js/app.min.js
 COPY --from=builder /app/assets/favicon.ico ./assets/favicon.ico
 COPY --from=builder /app/assets/manifest.json ./assets/manifest.json
+COPY --from=builder /app/assets/robots.txt ./assets/robots.txt
 
 ENTRYPOINT ["./main"]

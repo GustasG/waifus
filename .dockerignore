@@ -23,6 +23,10 @@ tmp/
 dist/
 build/
 
+# generated assets (built inside Docker)
+assets/css/globals.css
+assets/js/app.min.js
+
 # Other files
 .air.toml
 README.md

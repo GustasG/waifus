@@ -11,8 +11,9 @@ tasks:
     desc: Build the project
     cmds:
       - npx @tailwindcss/cli -i assets/css/styles.css -o assets/css/globals.css --minify
+      - npx esbuild assets/js/app.js --minify --outfile=assets/js/app.min.js
       - templ generate
-      - go build -ldflags "-s -w" cmd/server/main.go
+      - go build -ldflags "-s -w" -o main cmd/server/main.go
     env:
       CGO_ENABLED: 0
 
@@ -25,6 +26,11 @@ tasks:
     desc: Start tailwind in watch mode
     cmds:
       - npx @tailwindcss/cli -i assets/css/styles.css -o assets/css/globals.css --watch
+
+  js:
+    desc: Start esbuild in watch mode
+    cmds:
+      - npx esbuild assets/js/app.js --outfile=assets/js/app.min.js --watch
 
   server:
     desc: Start live server
@@ -39,4 +45,5 @@ tasks:
     deps:
       - server
       - tailwind
+      - js
       - templ

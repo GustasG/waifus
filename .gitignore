@@ -19,6 +19,7 @@ tmp/
 # Generated files
 *_templ.go
 globals.css
+app.min.js
 *_templ.txt
 
 # Log files

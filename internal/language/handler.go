@@ -52,20 +52,6 @@ func NewPageHandler() (LanguagePageHandler, error) {
 	return LanguagePageHandler{languages: languages, images: images, counts: counts}, nil
 }
 
-var popularLanguages = []string{"Python", "Go", "JavaScript", "TypeScript", "Rust", "Java", "C++", "C"}
-
-func (h LanguagePageHandler) FeaturedLanguage() string {
-	for _, lang := range popularLanguages {
-		if _, ok := h.images[lang]; ok {
-			return lang
-		}
-	}
-	if len(h.languages) > 0 {
-		return h.languages[0]
-	}
-	return ""
-}
-
 func (h LanguagePageHandler) Languages() []string     { return h.languages }
 func (h LanguagePageHandler) Counts() map[string]int  { return h.counts }
 
@@ -82,7 +68,10 @@ func (h LanguagePageHandler) HandleLanguage(w http.ResponseWriter, r *http.Reque
 
 	images, ok := h.images[language]
 	if !ok {
-		http.NotFound(w, r)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+		w.WriteHeader(http.StatusNotFound)
+		notFoundPage(h.languages, h.counts).Render(r.Context(), w)
 		return
 	}
 

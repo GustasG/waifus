@@ -20,26 +20,40 @@ func withCacheControl(h http.Handler, maxAge int) http.Handler {
 	})
 }
 
+func withHTMLCache(h http.Handler, maxAge int) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", maxAge))
+		w.Header().Set("Vary", "HX-Request")
+		h.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	langHandler, err := language.NewPageHandler()
 	if err != nil {
 		log.Fatalf("could not create language handler: %v", err)
 	}
 
-	idxHandler := index.NewHandler(langHandler.Languages(), langHandler.Counts(), langHandler.TotalImages(), langHandler.FeaturedLanguage())
+	idxHandler := index.NewHandler(langHandler.Languages(), langHandler.Counts(), langHandler.TotalImages())
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", idxHandler.HandleIndex)
-	mux.HandleFunc("GET /language/{language}", langHandler.HandleLanguage)
+	mux.Handle("GET /", withHTMLCache(http.HandlerFunc(idxHandler.HandleIndex), 60*15))
+	mux.Handle("GET /language/{language}", withHTMLCache(http.HandlerFunc(langHandler.HandleLanguage), 60*15))
 	mux.Handle("GET /assets/", withCacheControl(
 		http.StripPrefix("/assets", http.FileServer(http.Dir("assets"))),
-		86400,
+		60*60*24*7,
 	))
 	mux.Handle("GET /favicon.ico", withCacheControl(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			http.ServeFile(w, r, "assets/favicon.ico")
 		}),
-		86400,
+		60*60*24*7,
+	))
+	mux.Handle("GET /robots.txt", withCacheControl(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "assets/robots.txt")
+		}),
+		60*60*24,
 	))
 
 	port := os.Getenv("PORT")

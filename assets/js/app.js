@@ -1,9 +1,4 @@
-const sidebar = document.getElementById("sidebar");
-const backdrop = document.getElementById("sidebar-backdrop");
-const languageSearch = document.getElementById("language-search");
-const lightbox = document.getElementById("lightbox");
-const lightboxImg = document.getElementById("lightbox-img");
-const lightboxCaption = document.getElementById("lightbox-caption");
+let sidebar, backdrop, languageSearch, lightbox, lightboxImg, lightboxCaption;
 
 let currentImageIndex = 0;
 let currentImages = [];
@@ -138,8 +133,18 @@ function initPageContent() {
       if (scroller) scroller.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+
+  const browseBtn = document.getElementById("browse-random");
+  if (browseBtn) {
+    browseBtn.addEventListener("click", () => {
+      const langs = JSON.parse(browseBtn.dataset.languages);
+      const lang = langs[Math.floor(Math.random() * langs.length)];
+      window.location.href = "/language/" + encodeURIComponent(lang);
+    });
+  }
 }
 
+// Delegated handlers on document — set up once, survive any DOM replacement.
 document.addEventListener("click", (e) => {
   if (e.target.closest("#hamburger-button")) {
     openSidebar();
@@ -154,33 +159,6 @@ document.addEventListener("click", (e) => {
   if (isSidebarOpen() && !sidebar.contains(e.target)) {
     closeSidebar();
   }
-});
-
-if (backdrop) backdrop.addEventListener("click", closeSidebar);
-
-if (languageSearch) {
-  languageSearch.addEventListener("input", (e) =>
-    filterLanguages(e.target.value),
-  );
-}
-
-if (lightbox) {
-  lightbox.addEventListener("click", (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
-}
-
-document
-  .getElementById("lightbox-close")
-  ?.addEventListener("click", closeLightbox);
-
-document.getElementById("lightbox-prev")?.addEventListener("click", (e) => {
-  e.stopPropagation();
-  prevImage();
-});
-document.getElementById("lightbox-next")?.addEventListener("click", (e) => {
-  e.stopPropagation();
-  nextImage();
 });
 
 document.addEventListener("keydown", (e) => {
@@ -204,6 +182,7 @@ document.addEventListener("htmx:beforeRequest", (e) => {
   }
 });
 
+// Partial swap: only <main> changes — re-init page content, outer elements stay valid.
 document.addEventListener("htmx:afterSwap", () => {
   unblurImages();
   const scroller = document.querySelector("main .overflow-y-auto");
@@ -213,4 +192,45 @@ document.addEventListener("htmx:afterSwap", () => {
   initPageContent();
 });
 
-initPageContent();
+// Full body replacement: re-query every cached element reference and re-attach their listeners.
+function reinit() {
+  sidebar = document.getElementById("sidebar");
+  backdrop = document.getElementById("sidebar-backdrop");
+  languageSearch = document.getElementById("language-search");
+  lightbox = document.getElementById("lightbox");
+  lightboxImg = document.getElementById("lightbox-img");
+  lightboxCaption = document.getElementById("lightbox-caption");
+
+  if (backdrop) backdrop.addEventListener("click", closeSidebar);
+
+  if (languageSearch) {
+    languageSearch.addEventListener("input", (e) =>
+      filterLanguages(e.target.value),
+    );
+  }
+
+  if (lightbox) {
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+  }
+
+  document
+    .getElementById("lightbox-close")
+    ?.addEventListener("click", closeLightbox);
+
+  document.getElementById("lightbox-prev")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    prevImage();
+  });
+  document.getElementById("lightbox-next")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    nextImage();
+  });
+
+  initPageContent();
+}
+
+document.addEventListener("htmx:historyRestore", reinit);
+
+reinit();

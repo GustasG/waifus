@@ -1,3 +1,49 @@
 @import "tailwindcss";
 
 @source "../../../internal/**/*.templ";
+
+/* Sidebar language list — thin, purple-tinted */
+#language-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+#language-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+#language-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#language-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+}
+
+#language-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+/* Main image grid — slightly wider, rose-tinted */
+main .overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+main .overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+main .overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+main .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+main .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.55);
+}

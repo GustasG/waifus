@@ -1,6 +1,7 @@
 {
-  "dependencies": {
+  "devDependencies": {
     "@tailwindcss/cli": "^4.2.4",
+    "esbuild": "^0.28.0",
     "tailwindcss": "^4.2.4"
   }
 }
